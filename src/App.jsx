@@ -373,6 +373,110 @@ function RecordPaymentModal({ apiUrl, token, invoice, onClose, onDone }) {
   );
 }
 
+// =====================================================================
+// Connect screen — login / sign up against the live API, or skip to demo
+// =====================================================================
+
+function ConnectScreen({ onConnected, onDemo }) {
+  const [mode, setMode] = useState("login");
+  const [orgName, setOrgName] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      const path = mode === "login" ? "/api/auth/login" : "/api/auth/signup";
+      const body = mode === "login" ? { email, password } : { orgName, name, email, password };
+      const json = await apiRequest(API_BASE_URL, null, path, {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+      onConnected({ apiUrl: API_BASE_URL, token: json.token, user: json.user });
+    } catch (err) {
+      setError(
+        err.message?.includes("fetch") || err.message?.includes("Failed")
+          ? "Couldn't reach the server. Please try again in a moment."
+          : err.message
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 600, background: "#0F1B2D", borderRadius: 12, border: "1px solid #1E2E46" }}>
+      <div style={{ width: 360, padding: "36px 32px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 22 }}>
+          <div style={{ width: 26, height: 26, borderRadius: 6, background: "#3FB78A", display: "flex", alignItems: "center", justifyContent: "center", transform: "rotate(-3deg)" }}>
+            <CheckCircle2 size={15} color="#0B1524" strokeWidth={3} />
+          </div>
+          <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 19, color: "#EDEAE0" }}>Invoice Chaser</span>
+        </div>
+
+        <div style={{ display: "flex", gap: 6, marginBottom: 18, background: "#0B1524", borderRadius: 7, padding: 3 }}>
+          {["login", "signup"].map((m) => (
+            <button key={m} onClick={() => { setMode(m); setError(""); }} style={{
+              flex: 1, padding: "7px 0", border: "none", borderRadius: 5, cursor: "pointer",
+              fontSize: 12.5, fontWeight: 600, fontFamily: "'Inter', sans-serif",
+              background: mode === m ? "#233450" : "transparent", color: mode === m ? "#EDEAE0" : "#8B9AAE",
+            }}>{m === "login" ? "Log in" : "Sign up"}</button>
+          ))}
+        </div>
+
+        <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {mode === "signup" && (
+            <>
+              <Field label="Company name" value={orgName} onChange={setOrgName} required />
+              <Field label="Your name" value={name} onChange={setName} required />
+            </>
+          )}
+          <Field label="Email" value={email} onChange={setEmail} type="email" required />
+          <Field label="Password" value={password} onChange={setPassword} type="password" required />
+          {error && (
+            <div style={{ fontSize: 12, color: "#E85D4D", background: "#E85D4D14", border: "1px solid #E85D4D33", borderRadius: 6, padding: "8px 10px" }}>
+              {error}
+            </div>
+          )}
+          <button type="submit" disabled={busy} style={{
+            marginTop: 4, background: "#3FB78A", border: "none", color: "#0B1524", fontWeight: 700,
+            fontSize: 13.5, padding: "10px 0", borderRadius: 7, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+          }}>
+            {busy && <Loader2 size={14} className="spin" />}
+            {mode === "login" ? "Log in" : "Create account"}
+          </button>
+        </form>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "18px 0" }}>
+          <div style={{ flex: 1, height: 1, background: "#24354F" }} />
+          <span style={{ fontSize: 11, color: "#5A6B84" }}>or</span>
+          <div style={{ flex: 1, height: 1, background: "#24354F" }} />
+        </div>
+
+        <button onClick={onDemo} style={{
+          width: "100%", background: "transparent", border: "1px solid #24354F", color: "#8B9AAE",
+          fontSize: 12.5, padding: "9px 0", borderRadius: 7, cursor: "pointer", fontFamily: "'Inter', sans-serif",
+        }}>
+          Explore with demo data instead
+        </button>
+
+        <a href={WHATSAPP_CONTACT} target="_blank" rel="noopener noreferrer" style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+          marginTop: 14, fontSize: 12, color: "#5A6B84", textDecoration: "none", fontFamily: "'Inter', sans-serif",
+        }}>
+          <MessageCircle size={13} /> Need help? Chat with us on WhatsApp
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function Field({ label, value, onChange, type = "text", placeholder, required }) {
   return (
     <label style={{ display: "flex", flexDirection: "column", gap: 5 }}>
