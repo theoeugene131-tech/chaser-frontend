@@ -13,7 +13,7 @@ import {
 const WHATSAPP_CONTACT = "https://wa.me/2348026892077";
 
 // The one place the backend URL lives now — no field for the user to see or type.
-const API_BASE_URL = "https://chaser-backend-production.up.railway.app";
+const API_BASE_URL = "https://chaser-backend-6jsv.onrender.com";
 
 // =====================================================================
 // Demo fallback data — used only when no live API is reachable, so the
