@@ -124,7 +124,7 @@ async function apiRequest(apiUrl, token, path, opts = {}) {
   if (!res.ok) {
     const message = typeof json.message === "string" ? json.message : (json.error ? JSON.stringify(json.error) : `Request failed (${res.status})`);
     const err = new Error(message);
-    err.code = typeof json.error === "string" ? json.error : undefined; // e.g. "EMAIL_NOT_VERIFIED"
+    err.code = typeof json.error === "string" ? json.error : undefined;
     err.status = res.status;
     throw err;
   }
@@ -282,237 +282,23 @@ function RecordPaymentModal({ apiUrl, token, invoice, onClose, onDone }) {
 
   const submit = async (e) => {
     e.preventDefault();
-    setBusy(true); setError("");
-    try {
-      await apiRequest(apiUrl, token, `/api/invoices/${invoice.id}/record-payment`, {
-        method: "POST",
-        body: JSON.stringify({ amountCents: Math.round(parseFloat(amount) * 100), receivedAt, note: note || undefined }),
-      });
-      onDone();
-      onClose();
-    } catch (err) {
-      setError(err.message || "Couldn't record payment");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <Modal title={`Record payment — ${invoice.number}`} onClose={onClose}>
-      <div style={{ fontSize: 12, color: "#8B9AAE", marginBottom: 14 }}>
-        Remaining balance: <strong style={{ color: "#EDEAE0" }}>${(remainingCents / 100).toFixed(2)}</strong>
-      </div>
-      <form onSubmit={submit}>
-        <ModalField label="Amount received (USD)" type="number" step="0.01" min="0.01" placeholder={(remainingCents / 100).toFixed(2)} value={amount} onChange={(e) => setAmount(e.target.value)} required />
-        <ModalField label="Date received" type="date" value={receivedAt} onChange={(e) => setReceivedAt(e.target.value)} required />
-        <ModalField label="Note (optional)" placeholder="e.g. wire transfer, check #1234" value={note} onChange={(e) => setNote(e.target.value)} />
-        {error && (
-          <div style={{ fontSize: 12, color: "#E85D4D", background: "#E85D4D14", border: "1px solid #E85D4D33", borderRadius: 6, padding: "8px 10px", marginBottom: 12 }}>
-            {error}
-          </div>
-        )}
-        <button type="submit" disabled={busy} style={{
-          width: "100%", background: "#3FB78A", border: "none", color: "#0B1524", fontWeight: 700,
-          fontSize: 13.5, padding: "10px 0", borderRadius: 7, cursor: "pointer",
-        }}>
-          {busy ? "Recording..." : "Record payment"}
-        </button>
-      </form>
-    </Modal>
-  );
-}
-
-function AddNoteModal({ apiUrl, token, invoice, onClose, onDone }) {
-  const [note, setNote] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-
-  const submit = async (e) => {
-    e.preventDefault();
-    setBusy(true); setError("");
-    try {
-      await apiRequest(apiUrl, token, `/api/invoices/${invoice.id}/note`, { method: "POST", body: JSON.stringify({ note }) });
-      onDone();
-      onClose();
-    } catch (err) {
-      setError(err.message || "Couldn't add note");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <Modal title={`Add note — ${invoice.number}`} onClose={onClose}>
-      <form onSubmit={submit}>
-        <ModalTextarea label="What happened?" placeholder="e.g. Called AP, they said check is in the mail" value={note} onChange={(e) => setNote(e.target.value)} required />
-        {error && (
-          <div style={{ fontSize: 12, color: "#E85D4D", background: "#E85D4D14", border: "1px solid #E85D4D33", borderRadius: 6, padding: "8px 10px", marginBottom: 12 }}>
-            {error}
-          </div>
-        )}
-        <button type="submit" disabled={busy} style={{
-          width: "100%", background: "#3FB78A", border: "none", color: "#0B1524", fontWeight: 700,
-          fontSize: 13.5, padding: "10px 0", borderRadius: 7, cursor: "pointer",
-        }}>
-          {busy ? "Saving..." : "Add note"}
-        </button>
-      </form>
-    </Modal>
-  );
-}
-
-function EditInvoiceModal({ apiUrl, token, invoice, onClose, onDone }) {
-  const [number, setNumber] = useState(invoice.number);
-  const [amount, setAmount] = useState((invoice.amountCents / 100).toString());
-  const [dueDate, setDueDate] = useState(invoice.dueDate.slice(0, 10));
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-
-  const submit = async (e) => {
-    e.preventDefault();
-    setBusy(true); setError("");
-    try {
-      await apiRequest(apiUrl, token, `/api/invoices/${invoice.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ number, amountCents: Math.round(parseFloat(amount) * 100), dueDate }),
-      });
-      onDone();
-      onClose();
-    } catch (err) {
-      setError(err.message || "Couldn't save changes");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <Modal title="Edit invoice" onClose={onClose}>
-      <form onSubmit={submit}>
-        <ModalField label="Invoice number" value={number} onChange={(e) => setNumber(e.target.value)} required />
-        <ModalField label="Amount (USD)" type="number" step="0.01" min="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} required />
-        <ModalField label="Due date" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} required />
-        {error && (
-          <div style={{ fontSize: 12, color: "#E85D4D", background: "#E85D4D14", border: "1px solid #E85D4D33", borderRadius: 6, padding: "8px 10px", marginBottom: 12 }}>
-            {error}
-          </div>
-        )}
-        <button type="submit" disabled={busy} style={{
-          width: "100%", background: "#3FB78A", border: "none", color: "#0B1524", fontWeight: 700,
-          fontSize: 13.5, padding: "10px 0", borderRadius: 7, cursor: "pointer",
-        }}>
-          {busy ? "Saving..." : "Save changes"}
-        </button>
-      </form>
-    </Modal>
-  );
-}
-
-function CenterState({ icon: Icon, text }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: "50px 0", color: "#5A6B84" }}>
-      <Icon size={22} />
-      <span style={{ fontSize: 13 }}>{text}</span>
-    </div>
-  );
-}
-
-const linkBtn = { background: "none", border: "none", color: "#5CA9E8", fontSize: 12.5, fontWeight: 600, display: "flex", alignItems: "center", gap: 3, cursor: "pointer", fontFamily: "'Inter', sans-serif" };
-const td = { padding: "12px 8px", borderBottom: "1px solid #1E2E46", fontSize: 13 };
-
-// =====================================================================
-// Connect screen — login / sign up against the live API, or skip to demo
-// =====================================================================
-
-function ConnectScreen({ onConnected, onDemo }) {
-  const [mode, setMode] = useState("login");
-  const [orgName, setOrgName] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [verificationPending, setVerificationPending] = useState(false);
-  const [verificationEmailSent, setVerificationEmailSent] = useState(true);
-  const [unverifiedEmail, setUnverifiedEmail] = useState(null);
-  const [resendStatus, setResendStatus] = useState("idle"); // idle | sending | sent
-  const [resendError, setResendError] = useState("");
-
-  const submit = async (e) => {
-    e.preventDefault();
     setBusy(true);
     setError("");
-    setUnverifiedEmail(null);
     try {
       const path = mode === "login" ? "/api/auth/login" : "/api/auth/signup";
       const body = mode === "login" ? { email, password } : { orgName, name, email, password };
       const json = await apiRequest(API_BASE_URL, null, path, { method: "POST", body: JSON.stringify(body) });
-
-      if (mode === "signup" && json.requiresVerification) {
-        setVerificationEmailSent(json.emailSent !== false);
-        setVerificationPending(true);
-        return;
-      }
       onConnected({ apiUrl: API_BASE_URL, token: json.token, user: json.user });
     } catch (err) {
-      if (err.code === "EMAIL_NOT_VERIFIED") {
-        setUnverifiedEmail(email);
-      } else {
-        setError(
-          err.message?.includes("fetch") || err.message?.includes("Failed")
-            ? `Couldn't reach the server. Please try again in a moment.`
-            : err.message
-        );
-      }
+      setError(
+        err.message?.includes("fetch") || err.message?.includes("Failed")
+          ? `Couldn't reach the server. Please try again in a moment.`
+          : err.message
+      );
     } finally {
       setBusy(false);
     }
   };
-
-  const resend = async () => {
-    setResendStatus("sending");
-    setResendError("");
-    try {
-      await apiRequest(API_BASE_URL, null, "/api/auth/resend-verification", {
-        method: "POST",
-        body: JSON.stringify({ email: unverifiedEmail }),
-      });
-      setResendStatus("sent");
-    } catch (err) {
-      setResendStatus("idle");
-      setResendError(err.message || "The verification email could not be sent. Please try again later.");
-    }
-  };
-
-  const backToLogin = () => {
-    setVerificationPending(false);
-    setMode("login");
-    setPassword("");
-  };
-
-  if (verificationPending) {
-    return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 600, background: "#0F1B2D", borderRadius: 12, border: "1px solid #1E2E46" }}>
-        <div style={{ width: 360, padding: "36px 32px", textAlign: "center" }}>
-          <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#3FB78A22", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
-            <Mail size={22} color="#3FB78A" />
-          </div>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 19, color: "#EDEAE0", margin: "0 0 8px 0" }}>Check your email</h2>
-          <p style={{ fontSize: 13, color: "#8B9AAE", lineHeight: 1.6, marginBottom: 24 }}>
-            {verificationEmailSent
-              ? <>We sent a verification link to <strong style={{ color: "#EDEAE0" }}>{email}</strong>. Click it to activate your account, then come back and log in.</>
-              : <>Your account was created, but we couldn't send a verification email. Please return to login and use “Resend verification email” after email delivery is configured.</>}
-          </p>
-          <button onClick={backToLogin} style={{
-            width: "100%", background: "#233450", border: "1px solid #2E4463", color: "#EDEAE0",
-            fontSize: 13, fontWeight: 600, padding: "10px 0", borderRadius: 7, cursor: "pointer",
-          }}>
-            Back to login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 600, background: "#0F1B2D", borderRadius: 12, border: "1px solid #1E2E46" }}>
       <div style={{ width: 360, padding: "36px 32px" }}>
@@ -525,7 +311,7 @@ function ConnectScreen({ onConnected, onDemo }) {
 
         <div style={{ display: "flex", gap: 6, marginBottom: 18, background: "#0B1524", borderRadius: 7, padding: 3 }}>
           {["login", "signup"].map((m) => (
-            <button key={m} onClick={() => { setMode(m); setUnverifiedEmail(null); setError(""); }} style={{
+            <button key={m} onClick={() => { setMode(m); setError(""); }} style={{
               flex: 1, padding: "7px 0", border: "none", borderRadius: 5, cursor: "pointer",
               fontSize: 12.5, fontWeight: 600, fontFamily: "'Inter', sans-serif",
               background: mode === m ? "#233450" : "transparent", color: mode === m ? "#EDEAE0" : "#8B9AAE",
@@ -543,22 +329,7 @@ function ConnectScreen({ onConnected, onDemo }) {
           <Field label="Email" value={email} onChange={setEmail} type="email" required />
           <Field label="Password" value={password} onChange={setPassword} type="password" required />
 
-          {unverifiedEmail && (
-            <div style={{ fontSize: 12.5, color: "#E8A33D", background: "#E8A33D14", border: "1px solid #E8A33D33", borderRadius: 6, padding: "10px 12px" }}>
-              <div style={{ marginBottom: 8 }}>Your email isn't verified yet. Check your inbox for the link, or:</div>
-              <button type="button" onClick={resend} disabled={resendStatus !== "idle"} style={{
-                background: "none", border: "1px solid #E8A33D66", color: "#E8A33D", fontSize: 12, fontWeight: 600,
-                padding: "6px 10px", borderRadius: 5, cursor: resendStatus === "idle" ? "pointer" : "default",
-              }}>
-                {resendStatus === "idle" && "Resend verification email"}
-                {resendStatus === "sending" && "Sending..."}
-                {resendStatus === "sent" && "Sent — check your inbox"}
-              </button>
-              {resendError && (
-                <div style={{ marginTop: 8, color: "#E85D4D", lineHeight: 1.5 }}>
-                  {resendError}
-                </div>
-              )}
+
             </div>
           )}
 
