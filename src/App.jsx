@@ -432,6 +432,7 @@ function ConnectScreen({ onConnected, onDemo }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [verificationPending, setVerificationPending] = useState(false);
+  const [verificationEmailSent, setVerificationEmailSent] = useState(true);
   const [unverifiedEmail, setUnverifiedEmail] = useState(null);
   const [resendStatus, setResendStatus] = useState("idle"); // idle | sending | sent
   const [resendError, setResendError] = useState("");
@@ -447,6 +448,7 @@ function ConnectScreen({ onConnected, onDemo }) {
       const json = await apiRequest(API_BASE_URL, null, path, { method: "POST", body: JSON.stringify(body) });
 
       if (mode === "signup" && json.requiresVerification) {
+        setVerificationEmailSent(json.emailSent !== false);
         setVerificationPending(true);
         return;
       }
@@ -496,7 +498,9 @@ function ConnectScreen({ onConnected, onDemo }) {
           </div>
           <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 19, color: "#EDEAE0", margin: "0 0 8px 0" }}>Check your email</h2>
           <p style={{ fontSize: 13, color: "#8B9AAE", lineHeight: 1.6, marginBottom: 24 }}>
-            We sent a verification link to <strong style={{ color: "#EDEAE0" }}>{email}</strong>. Click it to activate your account, then come back and log in.
+            {verificationEmailSent
+              ? <>We sent a verification link to <strong style={{ color: "#EDEAE0" }}>{email}</strong>. Click it to activate your account, then come back and log in.</>
+              : <>Your account was created, but we couldn't send a verification email. Please return to login and use “Resend verification email” after email delivery is configured.</>}
           </p>
           <button onClick={backToLogin} style={{
             width: "100%", background: "#233450", border: "1px solid #2E4463", color: "#EDEAE0",
