@@ -434,6 +434,7 @@ function ConnectScreen({ onConnected, onDemo }) {
   const [verificationPending, setVerificationPending] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState(null);
   const [resendStatus, setResendStatus] = useState("idle"); // idle | sending | sent
+  const [resendError, setResendError] = useState("");
 
   const submit = async (e) => {
     e.preventDefault();
@@ -467,14 +468,16 @@ function ConnectScreen({ onConnected, onDemo }) {
 
   const resend = async () => {
     setResendStatus("sending");
+    setResendError("");
     try {
       await apiRequest(API_BASE_URL, null, "/api/auth/resend-verification", {
         method: "POST",
         body: JSON.stringify({ email: unverifiedEmail }),
       });
       setResendStatus("sent");
-    } catch {
+    } catch (err) {
       setResendStatus("idle");
+      setResendError(err.message || "The verification email could not be sent. Please try again later.");
     }
   };
 
@@ -547,6 +550,11 @@ function ConnectScreen({ onConnected, onDemo }) {
                 {resendStatus === "sending" && "Sending..."}
                 {resendStatus === "sent" && "Sent — check your inbox"}
               </button>
+              {resendError && (
+                <div style={{ marginTop: 8, color: "#E85D4D", lineHeight: 1.5 }}>
+                  {resendError}
+                </div>
+              )}
             </div>
           )}
 
