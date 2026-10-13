@@ -1172,8 +1172,8 @@ export default function ChaserApp() {
   const [tab, setTab] = useState("overview");
   const [showBanner, setShowBanner] = useState(true);
 
-  const handleConnected = ({ apiUrl, token, user }) => {
-    setSession({ apiUrl, token, user });
+  const handleConnected = ({ apiUrl, token, user, termsAccepted }) => {
+    setSession({ apiUrl, token, user, termsAccepted: Boolean(termsAccepted) });
     setMode("live");
   };
   const handleDemo = () => {
