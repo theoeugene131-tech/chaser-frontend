@@ -288,7 +288,7 @@ function RecordPaymentModal({ apiUrl, token, invoice, onClose, onDone }) {
       const path = mode === "login" ? "/api/auth/login" : "/api/auth/signup";
       const body = mode === "login" ? { email, password } : { orgName, name, email, password };
       const json = await apiRequest(API_BASE_URL, null, path, { method: "POST", body: JSON.stringify(body) });
-      onConnected({ apiUrl: API_BASE_URL, token: json.token, user: json.user });
+      onConnected({ apiUrl: API_BASE_URL, token: json.token, user: json.user, termsAccepted: json.termsAccepted });
     } catch (err) {
       setError(
         err.message?.includes("fetch") || err.message?.includes("Failed")
@@ -1162,6 +1162,60 @@ function IntegrationsView({ apiUrl, token, mode }) {
   );
 }
 
+
+const TERMS_VERSION = "2026-10-13-v1";
+
+function TermsAgreement({ apiUrl, token, onAccepted, onDecline }) {
+  const [agreed, setAgreed] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const accept = async () => {
+    if (!agreed) return;
+    setBusy(true); setError("");
+    try {
+      await apiRequest(apiUrl, token, "/api/auth/terms/accept", {
+        method: "POST",
+        body: JSON.stringify({ version: TERMS_VERSION, accepted: true }),
+      });
+      onAccepted();
+    } catch (err) {
+      setError(err.message || "Could not save your acceptance. Please try again.");
+    } finally { setBusy(false); }
+  };
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(5,12,22,0.96)", display: "flex", justifyContent: "center", alignItems: "center", padding: 18 }}>
+      <div style={{ width: "min(760px, 100%)", maxHeight: "92vh", display: "flex", flexDirection: "column", background: "#0F1B2D", color: "#EDEAE0", border: "1px solid #2E4463", borderRadius: 12, padding: 24 }}>
+        <div style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 700, marginBottom: 4 }}>Terms and Conditions</div>
+        <div style={{ fontSize: 12, color: "#8B9AAE", marginBottom: 16 }}>Invoice Chaser · Version 1.0 · Effective 13 October 2026</div>
+        <div style={{ overflowY: "auto", padding: "0 8px 12px 0", lineHeight: 1.55, fontSize: 12.5 }}>
+          <p><strong>1. Acceptance and authority.</strong> By agreeing, you confirm you have read these Terms and are authorised to bind your business if applicable. If you do not agree, do not use the Service.</p>
+          <p><strong>2. Service.</strong> Invoice Chaser helps organise invoices, customer records, payments, reminders, correspondence and supporting files. It does not guarantee invoice validity, message delivery, payment or debt recovery.</p>
+          <p><strong>3. Your responsibilities.</strong> You are responsible for the accuracy and lawfulness of data you enter, and for having the rights and legal basis needed to store personal data and contact recipients. Do not use the Service for unlawful harassment, fraud, spam or deceptive collection practices.</p>
+          <p><strong>4. Communications.</strong> Review recipients, amounts, due dates, message content and timing before sending or authorising reminders. “Sent” or “delivered” does not mean a recipient read or accepted a message. Follow applicable privacy and communications laws.</p>
+          <p><strong>5. Files and evidence.</strong> Upload only files you are entitled to use. Keep your own backups of important records. File types, size limits, storage and retention may be subject to app limits. Do not upload malware, passwords or unrelated sensitive information.</p>
+          <p><strong>6. Trials and payments.</strong> Any trial duration, subscription price, renewal terms, taxes and cancellation method will be disclosed before purchase. Charges and refunds are handled according to the checkout terms and applicable law.</p>
+          <p><strong>7. Privacy and security.</strong> The Service processes the account and business data you choose to store to provide and secure the Service. Protect your credentials. No online system can be guaranteed completely secure or continuously available. A detailed Privacy Notice should be reviewed before commercial launch.</p>
+          <p><strong>8. Intellectual property and acceptable use.</strong> The Service software and branding belong to the operator or its licensors. You receive a limited right to use the Service for your business while your account is active. Do not disrupt, misuse or attempt unauthorised access.</p>
+          <p><strong>9. Third parties.</strong> Connected hosting, storage, accounting, messaging and payment providers may have separate terms. Their services may be outside our control.</p>
+          <p><strong>10. Disclaimers and liability.</strong> The Service is provided as available and is not legal, tax, accounting or debt-collection advice. Liability limits apply only to the extent permitted by law and do not exclude rights or liabilities that cannot legally be excluded.</p>
+          <p><strong>11. Suspension and termination.</strong> Access may be suspended for unlawful use, material breach, security risks or legal requirements. Export important records before closing an account. Data retention and deletion are subject to applicable law and the published policy.</p>
+          <p><strong>12. Changes and governing law.</strong> Material changes may require renewed acceptance. The operator’s legal entity, registered address, governing law and legal contact must be published before public commercial launch.</p>
+          <p style={{ color: "#E8A33D" }}><strong>Important:</strong> These Terms are a draft and should be reviewed by a qualified lawyer before commercial launch. They do not replace a Privacy Notice.</p>
+        </div>
+        <label style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 12.5, margin: "10px 0 14px", lineHeight: 1.4 }}>
+          <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} style={{ marginTop: 2 }} />
+          <span>I have read and agree to the Invoice Chaser Terms and Conditions.</span>
+        </label>
+        {error && <div style={{ color: "#E85D4D", fontSize: 12, marginBottom: 10 }}>{error}</div>}
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={accept} disabled={!agreed || busy} style={{ flex: 1, background: agreed ? "#3FB78A" : "#233450", color: agreed ? "#0B1524" : "#8B9AAE", border: 0, borderRadius: 7, padding: 11, fontWeight: 700, cursor: agreed ? "pointer" : "not-allowed" }}>{busy ? "Saving acceptance…" : "Agree and continue"}</button>
+          <button onClick={onDecline} disabled={busy} style={{ background: "transparent", border: "1px solid #2E4463", color: "#8B9AAE", borderRadius: 7, padding: "11px 14px", cursor: "pointer" }}>Decline / log out</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // =====================================================================
 // App shell
 // =====================================================================
@@ -1204,6 +1258,20 @@ export default function ChaserApp() {
       <div style={shellStyle}>
         {fontImport}
         <ConnectScreen onConnected={handleConnected} onDemo={handleDemo} />
+      </div>
+    );
+  }
+
+  if (mode === "live" && session && !session.termsAccepted) {
+    return (
+      <div style={shellStyle}>
+        {fontImport}
+        <TermsAgreement
+          apiUrl={session.apiUrl}
+          token={session.token}
+          onAccepted={() => setSession((current) => ({ ...current, termsAccepted: true }))}
+          onDecline={logout}
+        />
       </div>
     );
   }
