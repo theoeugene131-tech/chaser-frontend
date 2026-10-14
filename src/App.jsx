@@ -595,6 +595,15 @@ function Field({ label, value, onChange, type = "text", placeholder, required })
 // Dashboard views — each fetches its own slice of live data
 // =====================================================================
 
+function CenterState({ icon: Icon, text }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, minHeight: 180, padding: 24, color: "#8B9AAE", fontSize: 13, textAlign: "center" }}>
+      {Icon && <Icon size={17} className={Icon === Loader2 ? "spin" : undefined} />}
+      <span>{text}</span>
+    </div>
+  );
+}
+
 function Overview({ apiUrl, token, mode, setTab }) {
   const [data, setData] = useState(mode === "demo" ? DEMO_OVERVIEW : null);
   const [events, setEvents] = useState(mode === "demo" ? DEMO_INBOX.slice(0, 3) : []);
