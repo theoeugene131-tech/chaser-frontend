@@ -274,108 +274,132 @@ function ConfirmModal({ title, message, confirmLabel = "Confirm", danger, busy, 
 function RecordPaymentModal({ apiUrl, token, invoice, onClose, onDone }) {
   const [amount, setAmount] = useState("");
   const [receivedAt, setReceivedAt] = useState(new Date().toISOString().slice(0, 10));
+  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
+  const [externalRef, setExternalRef] = useState("");
   const [note, setNote] = useState("");
+  const [payments, setPayments] = useState([]);
+  const [remainingCents, setRemainingCents] = useState(Math.max(0, invoice.amountCents - (invoice.amountPaidCents || 0)));
   const [busy, setBusy] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(true);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const remainingCents = invoice.amountCents - invoice.amountPaidCents;
+  const loadHistory = useCallback(() => {
+    setLoadingHistory(true);
+    return apiRequest(apiUrl, token, `/api/invoices/${invoice.id}/payments`)
+      .then((json) => {
+        setPayments(json.payments || []);
+        setRemainingCents(json.remainingCents ?? Math.max(0, invoice.amountCents - (invoice.amountPaidCents || 0)));
+      })
+      .catch((err) => setError(err.message || "Could not load payment history."))
+      .finally(() => setLoadingHistory(false));
+  }, [apiUrl, token, invoice.id, invoice.amountCents, invoice.amountPaidCents]);
+
+  useEffect(() => { loadHistory(); }, [loadHistory]);
 
   const submit = async (e) => {
     e.preventDefault();
+    const amountCents = Math.round(Number(amount) * 100);
+    if (!Number.isSafeInteger(amountCents) || amountCents <= 0) {
+      setError("Enter a valid payment amount greater than zero.");
+      return;
+    }
+    if (amountCents > remainingCents) {
+      setError(`Payment cannot exceed the remaining balance of ${moneyFull(remainingCents)}.`);
+      return;
+    }
     setBusy(true);
     setError("");
+    setSuccess("");
     try {
-      const path = mode === "login" ? "/api/auth/login" : "/api/auth/signup";
-      const body = mode === "login" ? { email, password } : { orgName, name, email, password };
-      const json = await apiRequest(API_BASE_URL, null, path, { method: "POST", body: JSON.stringify(body) });
-      onConnected({ apiUrl: API_BASE_URL, token: json.token, user: json.user, termsAccepted: json.termsAccepted });
+      const result = await apiRequest(apiUrl, token, `/api/invoices/${invoice.id}/record-payment`, {
+        method: "POST",
+        body: JSON.stringify({
+          amountCents,
+          receivedAt: new Date(`${receivedAt}T12:00:00`).toISOString(),
+          paymentMethod,
+          externalRef: externalRef.trim() || undefined,
+          note: note.trim() || undefined,
+        }),
+      });
+      setAmount("");
+      setExternalRef("");
+      setNote("");
+      setSuccess(result.fullyPaid ? "Payment recorded. Invoice is now fully paid." : "Payment recorded successfully.");
+      await loadHistory();
+      onDone();
     } catch (err) {
-      setError(
-        err.message?.includes("fetch") || err.message?.includes("Failed")
-          ? `Couldn't reach the server. Please try again in a moment.`
-          : err.message
-      );
+      setError(err.message || "Could not record payment.");
     } finally {
       setBusy(false);
     }
   };
+
+  const fieldStyle = {
+    background: "#0B1524", border: "1px solid #24354F", borderRadius: 6, padding: "9px 10px",
+    color: "#EDEAE0", fontSize: 13, fontFamily: "'Inter', sans-serif", width: "100%",
+  };
+
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 600, background: "#0F1B2D", borderRadius: 12, border: "1px solid #1E2E46" }}>
-      <div style={{ width: 360, padding: "36px 32px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 22 }}>
-          <div style={{ width: 26, height: 26, borderRadius: 6, background: "#3FB78A", display: "flex", alignItems: "center", justifyContent: "center", transform: "rotate(-3deg)" }}>
-            <CheckCircle2 size={15} color="#0B1524" strokeWidth={3} />
-          </div>
-          <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 19, color: "#EDEAE0" }}>Invoice Chaser</span>
+    <Modal title={`Record payment · ${invoice.number}`} onClose={onClose}>
+      <div style={{ background: "#0F1B2D", border: "1px solid #24354F", borderRadius: 8, padding: 12, marginBottom: 14 }}>
+        <div style={{ fontSize: 11, color: "#8B9AAE" }}>Invoice total</div>
+        <div style={{ fontSize: 17, color: "#EDEAE0", fontWeight: 700 }}>{moneyFull(invoice.amountCents)}</div>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginTop: 8, fontSize: 12 }}>
+          <span style={{ color: "#8B9AAE" }}>Remaining balance</span>
+          <strong style={{ color: remainingCents === 0 ? "#3FB78A" : "#E8A33D" }}>{moneyFull(remainingCents)}</strong>
         </div>
+      </div>
 
-        <div style={{ display: "flex", gap: 6, marginBottom: 18, background: "#0B1524", borderRadius: 7, padding: 3 }}>
-          {["login", "signup"].map((m) => (
-            <button key={m} onClick={() => { setMode(m); setError(""); }} style={{
-              flex: 1, padding: "7px 0", border: "none", borderRadius: 5, cursor: "pointer",
-              fontSize: 12.5, fontWeight: 600, fontFamily: "'Inter', sans-serif",
-              background: mode === m ? "#233450" : "transparent", color: mode === m ? "#EDEAE0" : "#8B9AAE",
-            }}>{m === "login" ? "Log in" : "Sign up"}</button>
-          ))}
-        </div>
-
-        <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {mode === "signup" && (
-            <>
-              <Field label="Company name" value={orgName} onChange={setOrgName} required />
-              <Field label="Your name" value={name} onChange={setName} required />
-            </>
-          )}
-          <Field label="Email" value={email} onChange={setEmail} type="email" required />
-          <Field label="Password" value={password} onChange={setPassword} type="password" required />
-
-
-            </div>
-          )}
-
-          {error && (
-            <div style={{ fontSize: 12, color: "#E85D4D", background: "#E85D4D14", border: "1px solid #E85D4D33", borderRadius: 6, padding: "8px 10px" }}>
-              {error}
-            </div>
-          )}
-
-          <button type="submit" disabled={busy} style={{
-            marginTop: 4, background: "#3FB78A", border: "none", color: "#0B1524", fontWeight: 700,
-            fontSize: 13.5, padding: "10px 0", borderRadius: 7, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-          }}>
-            {busy && <Loader2 size={14} className="spin" />}
-            {mode === "login" ? "Log in" : "Create account"}
+      {remainingCents > 0 ? (
+        <form onSubmit={submit}>
+          <ModalField label="Amount received" type="number" step="0.01" min="0.01" max={(remainingCents / 100).toFixed(2)} placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+          <ModalField label="Date received" type="date" value={receivedAt} onChange={(e) => setReceivedAt(e.target.value)} required />
+          <label style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
+            <span style={{ fontSize: 11, color: "#8B9AAE", fontWeight: 600 }}>Payment method</span>
+            <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} style={fieldStyle}>
+              <option value="bank_transfer">Bank transfer</option>
+              <option value="cash">Cash</option>
+              <option value="check">Cheque / check</option>
+              <option value="card">Card / POS</option>
+              <option value="mobile_money">Mobile money</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <ModalField label="Reference / transaction ID (optional)" value={externalRef} onChange={(e) => setExternalRef(e.target.value)} placeholder="Bank reference, receipt number..." />
+          <ModalTextarea label="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Any useful details about this payment..." />
+          {error && <div style={{ fontSize: 12, color: "#E85D4D", background: "#E85D4D14", border: "1px solid #E85D4D33", borderRadius: 6, padding: "8px 10px", marginBottom: 12 }}>{error}</div>}
+          {success && <div style={{ fontSize: 12, color: "#3FB78A", background: "#3FB78A14", border: "1px solid #3FB78A33", borderRadius: 6, padding: "8px 10px", marginBottom: 12 }}>{success}</div>}
+          <button type="submit" disabled={busy} style={{ width: "100%", background: "#3FB78A", border: "none", color: "#0B1524", fontWeight: 700, fontSize: 13, padding: "10px 0", borderRadius: 7, cursor: busy ? "wait" : "pointer" }}>
+            {busy ? "Recording..." : "Record payment"}
           </button>
         </form>
+      ) : (
+        <div style={{ color: "#3FB78A", fontSize: 12, marginBottom: 14 }}>This invoice has no outstanding balance.</div>
+      )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "18px 0" }}>
-          <div style={{ flex: 1, height: 1, background: "#24354F" }} />
-          <span style={{ fontSize: 11, color: "#5A6B84" }}>or</span>
-          <div style={{ flex: 1, height: 1, background: "#24354F" }} />
-        </div>
-
-        <button onClick={onDemo} style={{
-          width: "100%", background: "transparent", border: "1px solid #24354F", color: "#8B9AAE",
-          fontSize: 12.5, padding: "9px 0", borderRadius: 7, cursor: "pointer", fontFamily: "'Inter', sans-serif",
-        }}>
-          Explore with demo data instead
-        </button>
-
-        <a href={WHATSAPP_CONTACT} target="_blank" rel="noopener noreferrer" style={{
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-          marginTop: 14, fontSize: 12, color: "#5A6B84", textDecoration: "none", fontFamily: "'Inter', sans-serif",
-        }}>
-          <MessageCircle size={13} /> Need help? Chat with us on WhatsApp
-        </a>
+      <div style={{ borderTop: "1px solid #24354F", marginTop: 18, paddingTop: 14 }}>
+        <div style={{ color: "#EDEAE0", fontWeight: 600, fontSize: 13, marginBottom: 8 }}>Payment history</div>
+        {loadingHistory ? <div style={{ color: "#8B9AAE", fontSize: 12 }}>Loading payment history...</div> :
+          payments.length === 0 ? <div style={{ color: "#8B9AAE", fontSize: 12 }}>No payments recorded yet.</div> :
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 170, overflowY: "auto" }}>
+            {payments.map((p) => (
+              <div key={p.id} style={{ background: "#0F1B2D", border: "1px solid #24354F", borderRadius: 7, padding: 9 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                  <strong style={{ color: "#3FB78A", fontSize: 12 }}>{moneyFull(p.amountCents)}</strong>
+                  <span style={{ color: "#8B9AAE", fontSize: 11 }}>{new Date(p.receivedAt).toLocaleDateString()}</span>
+                </div>
+                <div style={{ color: "#8B9AAE", fontSize: 11, marginTop: 4, textTransform: "capitalize" }}>{(p.paymentMethod || p.source || "manual").replaceAll("_", " ")}</div>
+                {p.externalRef && <div style={{ color: "#8B9AAE", fontSize: 11, marginTop: 3 }}>Ref: {p.externalRef}</div>}
+                {p.note && <div style={{ color: "#8B9AAE", fontSize: 11, marginTop: 3 }}>{p.note}</div>}
+              </div>
+            ))}
+          </div>}
       </div>
-    </div>
+      <button type="button" onClick={onClose} style={{ width: "100%", marginTop: 12, background: "transparent", border: "1px solid #24354F", color: "#8B9AAE", fontSize: 12, padding: "8px 0", borderRadius: 7, cursor: "pointer" }}>Close</button>
+    </Modal>
   );
 }
-
-// =====================================================================
-// Connect screen — login / sign up against the live API, or skip to demo
-// =====================================================================
 
 function ConnectScreen({ onConnected, onDemo }) {
   const [mode, setMode] = useState("login");
