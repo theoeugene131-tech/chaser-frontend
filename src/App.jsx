@@ -467,7 +467,7 @@ function ConnectScreen({ onConnected, onDemo }) {
         method: "POST",
         body: JSON.stringify(body),
       });
-      onConnected({ apiUrl: API_BASE_URL, token: json.token, user: json.user });
+      onConnected({ apiUrl: API_BASE_URL, token: json.token, user: json.user, termsAccepted: json.termsAccepted });
     } catch (err) {
       setError(
         err.message?.includes("fetch") || err.message?.includes("Failed")
