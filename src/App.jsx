@@ -453,16 +453,22 @@ function ConnectScreen({ onConnected, onDemo }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const [showSignupTerms, setShowSignupTerms] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   const submit = async (e) => {
     e.preventDefault();
+    if (mode === "signup" && !termsAgreed) {
+      setError("Please read and accept the Terms and Conditions and Privacy Notice to create an account.");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
       const path = mode === "login" ? "/api/auth/login" : "/api/auth/signup";
-      const body = mode === "login" ? { email, password } : { orgName, name, email, password };
+      const body = mode === "login" ? { email, password } : { orgName, name, email, password, acceptedTerms: true, termsVersion: TERMS_VERSION };
       const json = await apiRequest(API_BASE_URL, null, path, {
         method: "POST",
         body: JSON.stringify(body),
@@ -491,7 +497,7 @@ function ConnectScreen({ onConnected, onDemo }) {
 
         <div style={{ display: "flex", gap: 6, marginBottom: 18, background: "#0B1524", borderRadius: 7, padding: 3 }}>
           {["login", "signup"].map((m) => (
-            <button key={m} onClick={() => { setMode(m); setError(""); }} style={{
+            <button key={m} onClick={() => { setMode(m); setError(""); setTermsAgreed(false); setShowSignupTerms(false); }} style={{
               flex: 1, padding: "7px 0", border: "none", borderRadius: 5, cursor: "pointer",
               fontSize: 12.5, fontWeight: 600, fontFamily: "'Inter', sans-serif",
               background: mode === m ? "#233450" : "transparent", color: mode === m ? "#EDEAE0" : "#8B9AAE",
@@ -508,6 +514,28 @@ function ConnectScreen({ onConnected, onDemo }) {
           )}
           <Field label="Email" value={email} onChange={setEmail} type="email" required />
           <Field label="Password" value={password} onChange={setPassword} type="password" required />
+          {mode === "signup" && (
+            <div style={{ border: "1px solid #24354F", borderRadius: 7, padding: 10, background: "#0B1524" }}>
+              <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 11.5, color: "#C5CFDC", lineHeight: 1.5, cursor: "pointer" }}>
+                <input type="checkbox" checked={termsAgreed} onChange={(e) => setTermsAgreed(e.target.checked)} style={{ marginTop: 3 }} />
+                <span>I have read and agree to the <button type="button" onClick={() => setShowSignupTerms((v) => !v)} style={{ display: "inline", padding: 0, border: 0, background: "none", color: "#3FB78A", textDecoration: "underline", cursor: "pointer", font: "inherit" }}>Terms and Conditions</button> and acknowledge the Privacy Notice below.</span>
+              </label>
+              {showSignupTerms && (
+                <div style={{ marginTop: 10, maxHeight: 190, overflowY: "auto", fontSize: 11, color: "#8B9AAE", lineHeight: 1.5 }}>
+                  <p><strong>Invoice Chaser Terms · Version {TERMS_VERSION}</strong></p>
+                  <p><strong>1. Service.</strong> Invoice Chaser helps organise invoices, customer records, payments, reminders, correspondence and supporting files. It does not guarantee invoice validity, message delivery, payment or debt recovery.</p>
+                  <p><strong>2. Your responsibilities.</strong> You are responsible for the accuracy and lawful use of information you enter, and for having the rights and legal basis needed to store personal data and contact recipients. Do not use the Service for unlawful harassment, fraud, spam or deceptive collection practices.</p>
+                  <p><strong>3. Communications and files.</strong> Review recipients, amounts, due dates and message content before sending reminders. “Sent” or “delivered” does not mean a recipient read or accepted a message. Upload only files you are entitled to use and keep your own backups.</p>
+                  <p><strong>4. Trials and payments.</strong> Trial duration, subscription price, renewal terms, taxes and cancellation method will be disclosed before purchase. Charges and refunds follow checkout terms and applicable law.</p>
+                  <p><strong>5. Privacy and security.</strong> The Service processes account and business data you choose to store to provide and secure the Service. Protect your credentials. No online system can be guaranteed completely secure or continuously available.</p>
+                  <p><strong>6. Third parties, liability and termination.</strong> Third-party providers may have separate terms. The Service is provided as available and is not legal, tax, accounting or debt-collection advice. Access may be suspended for unlawful use, material breach, security risks or legal requirements. Material changes may require renewed acceptance.</p>
+                  <p style={{ color: "#E8A33D" }}>These Terms and the Privacy Notice are drafts and should be reviewed by a qualified lawyer before commercial launch. The operator's legal entity, contact details and governing law must be published before launch.</p>
+                  <strong>Privacy Notice summary</strong>
+                  <p>Invoice Chaser uses account and business information to provide the service, maintain security, and support invoice/payment tracking. Information may be processed by hosting, database, storage and other providers needed to operate the service. Do not upload information you are not authorised to share. A complete Privacy Policy describing retention, user rights, contact details and applicable law should be published before public launch.</p>
+                </div>
+              )}
+            </div>
+          )}
           {error && (
             <div style={{ fontSize: 12, color: "#E85D4D", background: "#E85D4D14", border: "1px solid #E85D4D33", borderRadius: 6, padding: "8px 10px" }}>
               {error}
