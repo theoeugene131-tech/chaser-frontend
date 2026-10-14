@@ -1240,17 +1240,28 @@ function TermsAgreement({ apiUrl, token, onAccepted, onDecline }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const accept = async () => {
-    if (!agreed) return;
-    setBusy(true); setError("");
+    if (!agreed || busy) return;
+    setBusy(true);
+    setError("");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
     try {
       await apiRequest(apiUrl, token, "/api/auth/terms/accept", {
         method: "POST",
+        signal: controller.signal,
         body: JSON.stringify({ version: TERMS_VERSION, accepted: true }),
       });
       onAccepted();
     } catch (err) {
-      setError(err.message || "Could not save your acceptance. Please try again.");
-    } finally { setBusy(false); }
+      setError(
+        err.name === "AbortError"
+          ? "The server took too long to respond. Please try again. If this continues, the server may need attention."
+          : (err.message || "Could not save your acceptance. Please try again.")
+      );
+    } finally {
+      clearTimeout(timeoutId);
+      setBusy(false);
+    }
   };
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(5,12,22,0.96)", display: "flex", justifyContent: "center", alignItems: "center", padding: 18 }}>
