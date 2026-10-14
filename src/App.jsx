@@ -401,6 +401,52 @@ function RecordPaymentModal({ apiUrl, token, invoice, onClose, onDone }) {
   );
 }
 
+function AddNoteModal({ apiUrl, token, invoice, onClose, onDone }) {
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const submit = async (e) => {
+    e.preventDefault(); setBusy(true); setError("");
+    try {
+      await apiRequest(apiUrl, token, `/api/invoices/${invoice.id}/note`, { method: "POST", body: JSON.stringify({ note: note.trim() }) });
+      onDone(); onClose();
+    } catch (err) { setError(err.message || "Couldn't save note."); }
+    finally { setBusy(false); }
+  };
+  return <Modal title={`Add note · ${invoice.number}`} onClose={onClose}><form onSubmit={submit}>
+    <ModalTextarea label="Activity note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Call summary, email sent, promise to pay..." required />
+    {error && <div style={{ color: "#E85D4D", fontSize: 12, marginBottom: 10 }}>{error}</div>}
+    <button type="submit" disabled={busy || !note.trim()} style={{ width: "100%", background: "#3FB78A", border: 0, color: "#0B1524", fontWeight: 700, padding: 10, borderRadius: 7 }}>{busy ? "Saving..." : "Save note"}</button>
+  </form></Modal>;
+}
+
+function EditInvoiceModal({ apiUrl, token, invoice, onClose, onDone }) {
+  const [number, setNumber] = useState(invoice.number || "");
+  const [amount, setAmount] = useState(((invoice.amountCents || 0) / 100).toFixed(2));
+  const [dueDate, setDueDate] = useState(new Date(invoice.dueDate).toISOString().slice(0, 10));
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const submit = async (e) => {
+    e.preventDefault(); setBusy(true); setError("");
+    const amountCents = Math.round(Number(amount) * 100);
+    if (!Number.isSafeInteger(amountCents) || amountCents < (invoice.amountPaidCents || 0) || amountCents <= 0) {
+      setError("Invoice total must be positive and cannot be less than payments already received."); setBusy(false); return;
+    }
+    try {
+      await apiRequest(apiUrl, token, `/api/invoices/${invoice.id}`, { method: "PATCH", body: JSON.stringify({ number: number.trim(), amountCents, dueDate }) });
+      onDone(); onClose();
+    } catch (err) { setError(err.message || "Couldn't update invoice."); }
+    finally { setBusy(false); }
+  };
+  return <Modal title={`Edit invoice · ${invoice.number}`} onClose={onClose}><form onSubmit={submit}>
+    <ModalField label="Invoice number" value={number} onChange={(e) => setNumber(e.target.value)} required />
+    <ModalField label="Total amount (USD)" type="number" step="0.01" min={((invoice.amountPaidCents || 0) / 100).toFixed(2)} value={amount} onChange={(e) => setAmount(e.target.value)} required />
+    <ModalField label="Due date" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} required />
+    {error && <div style={{ color: "#E85D4D", fontSize: 12, marginBottom: 10 }}>{error}</div>}
+    <button type="submit" disabled={busy} style={{ width: "100%", background: "#3FB78A", border: 0, color: "#0B1524", fontWeight: 700, padding: 10, borderRadius: 7 }}>{busy ? "Saving..." : "Save changes"}</button>
+  </form></Modal>;
+}
+
 function ConnectScreen({ onConnected, onDemo }) {
   const [mode, setMode] = useState("login");
   const [orgName, setOrgName] = useState("");
