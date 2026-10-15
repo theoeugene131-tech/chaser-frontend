@@ -844,8 +844,11 @@ function ManualReminderModal({ apiUrl, token, invoice, onClose, onDone }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [followUp, setFollowUp] = useState("awaiting");
+  const [followUpBusy, setFollowUpBusy] = useState(false);
   const due = invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : "the agreed due date";
   const balanceCents = Math.max(0, (invoice.amountCents || 0) - (invoice.amountPaidCents || 0));
+  const blocked = invoice.status === "paid" || invoice.status === "disputed" || balanceCents <= 0;
   const subject = "Payment reminder — invoice " + invoice.number;
   const message = "Subject: " + subject + "\n\nHello " + (invoice.customerName || "there") + ",\n\nI hope you're doing well. This is a friendly reminder that invoice " + invoice.number + " for " + moneyFull(balanceCents) + " is outstanding and was due on " + due + ".\n\nPlease let me know when we can expect payment, or contact me if you've already paid and I should update our records.\n\nThank you,\nYour accounts team";
 
@@ -876,12 +879,39 @@ function ManualReminderModal({ apiUrl, token, invoice, onClose, onDone }) {
     }
   };
 
+  const saveFollowUpStatus = async () => {
+    const labels = {
+      awaiting: "Follow-up status: awaiting customer response",
+      promised: "Follow-up status: customer promised payment",
+      needed: "Follow-up status: another reminder needed",
+    };
+    setFollowUpBusy(true);
+    setError("");
+    try {
+      await apiRequest(apiUrl, token, "/api/invoices/" + invoice.id + "/note", {
+        method: "POST",
+        body: JSON.stringify({ note: labels[followUp] }),
+      });
+      onDone();
+      onClose();
+    } catch (err) {
+      setError(err.message || "Could not save follow-up status.");
+    } finally {
+      setFollowUpBusy(false);
+    }
+  };
+
   const emailHref = invoice.customerEmail
     ? "mailto:" + encodeURIComponent(invoice.customerEmail) + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(message.split("\n\n").slice(1).join("\n\n"))
     : null;
 
   return (
     <Modal title={"Prepare reminder · " + invoice.number} onClose={onClose}>
+      {blocked ? (
+        <div style={{ fontSize: 12, color: "#E8A33D", lineHeight: 1.6 }}>
+          {invoice.status === "disputed" ? "This invoice is disputed, so reminders are paused." : "This invoice has no outstanding balance, so no reminder is needed."}
+        </div>
+      ) : <>
       <p style={{ fontSize: 12, color: "#8B9AAE", lineHeight: 1.5, marginTop: 0 }}>
         No email service or domain needed. Copy this message into Gmail or WhatsApp, or open your email app if the customer has an email address saved.
       </p>
@@ -893,7 +923,17 @@ function ManualReminderModal({ apiUrl, token, invoice, onClose, onDone }) {
         {emailHref && <a href={emailHref} style={{ textAlign: "center", textDecoration: "none", background: "#233450", border: "1px solid #2E4463", color: "#EDEAE0", fontSize: 12.5, fontWeight: 600, padding: "10px", borderRadius: 7 }}>Open email draft for {invoice.customerEmail}</a>}
         <button onClick={markFollowUp} disabled={busy} style={{ background: "transparent", border: "1px solid #24354F", color: "#8B9AAE", padding: "9px", borderRadius: 7, cursor: "pointer" }}>{busy ? "Logging..." : "I sent it — log follow-up"}</button>
       </div>
+      <div style={{ marginTop: 16, borderTop: "1px solid #24354F", paddingTop: 12 }}>
+        <label style={{ display: "block", color: "#8B9AAE", fontSize: 11, marginBottom: 6 }}>Follow-up status</label>
+        <select value={followUp} onChange={(e) => setFollowUp(e.target.value)} style={{ width: "100%", background: "#0B1524", border: "1px solid #24354F", borderRadius: 6, padding: 9, color: "#EDEAE0" }}>
+          <option value="awaiting">Awaiting response</option>
+          <option value="promised">Customer promised payment</option>
+          <option value="needed">Another reminder needed</option>
+        </select>
+        <button onClick={saveFollowUpStatus} disabled={followUpBusy} style={{ width: "100%", marginTop: 8, background: "#233450", border: "1px solid #2E4463", color: "#EDEAE0", padding: 9, borderRadius: 7, cursor: "pointer" }}>{followUpBusy ? "Saving..." : "Save follow-up status"}</button>
+      </div>
       <p style={{ fontSize: 10.5, color: "#5A6B84", lineHeight: 1.5, marginBottom: 0 }}>Invoice Chaser will not send this message itself. Only click “I sent it” after you send it manually.</p>
+      </>}
     </Modal>
   );
 }
@@ -1005,7 +1045,7 @@ function InvoicesView({ apiUrl, token, mode }) {
                 </td>
                 <td style={td}><StampBadge type={inv.status} /></td>
                 <td style={{ ...td, display: "flex", gap: 6, alignItems: "center" }}>
-                  {inv.status !== "paid" && (
+                  {inv.status !== "paid" && inv.status !== "disputed" && (
                     <>
                       <ActionBtn label="Draft reminder" icon={Mail} onClick={() => setActiveModal({ type: "reminder", invoice: inv })} />
                       <ActionBtn label="Escalate" icon={AlertTriangle} busy={actioning === inv.id + "escalate"} onClick={() => act(inv.id, "escalate")} />
