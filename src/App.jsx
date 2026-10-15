@@ -108,12 +108,27 @@ const nav = [
 
 // ---------- Helpers ----------
 
+const CURRENCY_OPTIONS = [
+  { code: "USD", label: "US Dollar ($)", locale: "en-US" },
+  { code: "GBP", label: "British Pound (£)", locale: "en-GB" },
+  { code: "EUR", label: "Euro (€)", locale: "de-DE" },
+  { code: "NGN", label: "Nigerian Naira (₦)", locale: "en-NG" },
+  { code: "CAD", label: "Canadian Dollar (CA$)", locale: "en-CA" },
+  { code: "AUD", label: "Australian Dollar (A$)", locale: "en-AU" },
+  { code: "ZAR", label: "South African Rand (R)", locale: "en-ZA" },
+];
+let activeCurrencyCode = "USD";
 const dollars = (cents) => (cents ?? 0) / 100;
-const money = (cents) => {
-  const n = dollars(cents);
-  return n >= 1000 ? `$${(n / 1000).toFixed(1)}k` : `$${n.toFixed(0)}`;
+const formatMoney = (cents, compact = false) => {
+  const currency = CURRENCY_OPTIONS.find((item) => item.code === activeCurrencyCode) || CURRENCY_OPTIONS[0];
+  const amount = dollars(cents);
+  if (compact && Math.abs(amount) >= 1000) {
+    return new Intl.NumberFormat(currency.locale, { style: "currency", currency: currency.code, notation: "compact", maximumFractionDigits: 1 }).format(amount);
+  }
+  return new Intl.NumberFormat(currency.locale, { style: "currency", currency: currency.code, maximumFractionDigits: 2 }).format(amount);
 };
-const moneyFull = (cents) => `$${dollars(cents).toLocaleString(undefined, { minimumFractionDigits: 0 })}`;
+const money = (cents) => formatMoney(cents, true);
+const moneyFull = (cents) => formatMoney(cents, false);
 const timeAgo = (iso) => {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.round(diff / 60000);
@@ -453,7 +468,7 @@ function EditInvoiceModal({ apiUrl, token, invoice, onClose, onDone }) {
   };
   return <Modal title={`Edit invoice · ${invoice.number}`} onClose={onClose}><form onSubmit={submit}>
     <ModalField label="Invoice number" value={number} onChange={(e) => setNumber(e.target.value)} required />
-    <ModalField label="Total amount (USD)" type="number" step="0.01" min={((invoice.amountPaidCents || 0) / 100).toFixed(2)} value={amount} onChange={(e) => setAmount(e.target.value)} required />
+    <ModalField label="Total amount" type="number" step="0.01" min={((invoice.amountPaidCents || 0) / 100).toFixed(2)} value={amount} onChange={(e) => setAmount(e.target.value)} required />
     <ModalField label="Due date" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} required />
     {error && <div style={{ color: "#E85D4D", fontSize: 12, marginBottom: 10 }}>{error}</div>}
     <button type="submit" disabled={busy} style={{ width: "100%", background: "#3FB78A", border: 0, color: "#0B1524", fontWeight: 700, padding: 10, borderRadius: 7 }}>{busy ? "Saving..." : "Save changes"}</button>
@@ -821,7 +836,7 @@ function AddInvoiceModal({ apiUrl, token, onClose, onCreated }) {
         )}
 
         <ModalField label="Invoice number" placeholder="INV-1001" value={number} onChange={(e) => setNumber(e.target.value)} required />
-        <ModalField label="Amount (USD)" type="number" step="0.01" min="0.01" placeholder="1500.00" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+        <ModalField label="Amount" type="number" step="0.01" min="0.01" placeholder="1500.00" value={amount} onChange={(e) => setAmount(e.target.value)} required />
         <ModalField label="Due date" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} required />
 
         {error && (
@@ -1462,6 +1477,8 @@ export default function ChaserApp() {
   const [mode, setMode] = useState(null); // 'live' | 'demo'
   const [tab, setTab] = useState("overview");
   const [showBanner, setShowBanner] = useState(true);
+  const [currencyCode, setCurrencyCode] = useState(() => { try { return localStorage.getItem("invoice-chaser-currency") || "USD"; } catch { return "USD"; } });
+  activeCurrencyCode = currencyCode;
 
   const handleConnected = ({ apiUrl, token, user, termsAccepted }) => {
     setSession({ apiUrl, token, user, termsAccepted: Boolean(termsAccepted) });
@@ -1566,7 +1583,13 @@ export default function ChaserApp() {
           <div>
             <h1 style={{ margin: 0, fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 600 }}>{titles[tab]}</h1>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 7, color: "#8B9AAE", fontSize: 11 }}>
+              Currency
+              <select aria-label="Display currency" value={currencyCode} onChange={(e) => { const nextCode = e.target.value; setCurrencyCode(nextCode); try { localStorage.setItem("invoice-chaser-currency", nextCode); } catch {} }} style={{ background: "#0B1524", color: "#EDEAE0", border: "1px solid #2E4463", borderRadius: 6, padding: "7px 8px", maxWidth: 150 }}>
+                {CURRENCY_OPTIONS.map((item) => <option key={item.code} value={item.code}>{item.code}</option>)}
+              </select>
+            </label>
             <Bell size={16} color="#8B9AAE" />
             <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#233450", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700 }}>
               {(session.user?.name || "?").split(" ").map((s) => s[0]).join("").slice(0, 2).toUpperCase()}
