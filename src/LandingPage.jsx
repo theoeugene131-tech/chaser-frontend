@@ -157,6 +157,23 @@ export default function LandingPage() {
           </div>
         </section>
 
+        <section id="managed-service" style={{ background: "#0e1b2d", borderTop: "1px solid #1d2e43", borderBottom: "1px solid #1d2e43" }}>
+          <div className="ic-wrap" style={{ padding: "76px 0", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 34, alignItems: "center" }}>
+            <div>
+              <div style={{ color: "#60d6a8", fontWeight: 800, letterSpacing: ".12em", fontSize: 11, textTransform: "uppercase", marginBottom: 13 }}>A hands-off option</div>
+              <h2 style={{ fontSize: "clamp(30px, 4vw, 43px)", letterSpacing: "-1.6px", lineHeight: 1.13, margin: "0 0 15px" }}>Let us manage your invoice follow-ups for you.</h2>
+              <p style={{ color: "#9bacc0", lineHeight: 1.8, fontSize: 14, margin: "0 0 18px" }}>Prefer to focus on running your business? Ask about our managed service. With an agreed scope and a higher service fee, our team can help maintain invoice records, track payments, prepare and coordinate follow-ups, and send you regular status updates.</p>
+              <p style={{ color: "#9bacc0", lineHeight: 1.7, fontSize: 12, margin: "0 0 22px" }}>We’ll discuss your needs, access permissions, service boundaries, pricing, and approval process with you before work begins. You remain responsible for the accuracy of your invoices and for decisions about disputes, write-offs, and legal action. We won’t promise that every debtor will pay.</p>
+              <a className="ic-cta" href={WHATSAPP_CONTACT} target="_blank" rel="noopener noreferrer" onClick={() => track("click_managed_service_enquiry", "managed_service_enquiry")} style={{ ...button, background: "#3fb78a", color: "#081522", border: "1px solid #3fb78a" }}>Ask about managed service <span>↗</span></a>
+            </div>
+            <div style={{ border: "1px solid #2a4058", background: "#101e31", borderRadius: 14, padding: 25 }}>
+              <h3 style={{ fontSize: 17, margin: "0 0 17px" }}>What we can help with</h3>
+              {["Organising invoices and customer records", "Updating payment and follow-up histories", "Preparing reminders for your approval", "Coordinating agreed follow-ups", "Providing regular outstanding-invoice summaries"].map((item) => <div key={item} style={{ display: "flex", gap: 10, padding: "10px 0", borderBottom: "1px solid #24354a", color: "#b4c2d2", fontSize: 13, lineHeight: 1.5 }}><span style={{ color: "#60d6a8" }}>✓</span><span>{item}</span></div>)}
+              <p style={{ color: "#72879d", fontSize: 11, lineHeight: 1.6, margin: "16px 0 0" }}>Managed service is by enquiry and subject to agreement, availability, and a separate quote. It is not represented as included in the standard self-service plan.</p>
+            </div>
+          </div>
+        </section>
+
         <section className="ic-wrap" style={{ padding: "82px 0", textAlign: "center" }}>
           <h2 style={{ fontSize: "clamp(30px, 4vw, 44px)", letterSpacing: "-1.7px", margin: "0 0 15px" }}>Make every follow-up count.</h2>
           <p style={{ color: "#9bacc0", fontSize: 14, lineHeight: 1.7, maxWidth: 530, margin: "0 auto 25px" }}>Start organising your receivables with a clearer view of invoices, customers, and payment history.</p>
