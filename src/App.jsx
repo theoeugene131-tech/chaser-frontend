@@ -840,6 +840,8 @@ function AddInvoiceModal({ apiUrl, token, onClose, onCreated }) {
   );
 }
 
+const td = { padding: "12px 8px", borderBottom: "1px solid #24354F", fontSize: 12.5, verticalAlign: "middle" };
+
 function InvoicesView({ apiUrl, token, mode }) {
   const [q, setQ] = useState("");
   const [invoices, setInvoices] = useState(mode === "demo" ? DEMO_INVOICES : []);
