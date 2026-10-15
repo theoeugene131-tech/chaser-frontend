@@ -1,52 +1,64 @@
 # Invoice Chaser — Terms and Conditions
 
-**Effective date:** 13 October 2026  
-**Version:** 1.0  
-**Service operator:** Invoice Chaser (the “Service”). Replace this operator description with the registered legal entity and contact address before public commercial launch.
+**Effective date:** 15 October 2026  
+**Version:** 2.0
 
-These Terms are a practical draft for the Invoice Chaser service. They should be reviewed by a qualified lawyer familiar with Nigerian law and any other jurisdictions in which the Service is offered before being treated as final legal advice.
+These Terms explain the rules that apply when you access or use Invoice Chaser (the “Service”). By creating an account, selecting “I agree,” or using the Service after being asked to accept these Terms, you agree to them. If you use the Service for a business or organisation, you confirm that you are authorised to accept these Terms on its behalf. If you do not agree, do not use the Service.
 
-## 1. Acceptance and account authority
-By selecting “I agree” in the app, you confirm that you have read and accepted these Terms and, if acting for a business, that you are authorised to bind that business. If you do not agree, do not use the Service. The Service may require renewed acceptance when material terms change.
+> **Important:** These Terms are a working draft and are not legal advice. Before commercial launch, the Service operator should complete its verified legal identity and address, publish a complete Privacy Notice, and obtain legal review appropriate to the jurisdictions in which the Service is offered.
 
-## 2. What the Service does
-Invoice Chaser provides tools to organise invoice and customer records, record payments, prepare or track payment reminders, and store correspondence and supporting files. Features may change over time. The Service is an administrative tool and does not guarantee that an invoice is valid, a debtor will pay, a message will be delivered, or a debt will be recovered.
+## 1. What Invoice Chaser does
 
-## 3. Your responsibilities
-You are responsible for the accuracy and lawfulness of the information you upload or enter, including invoices, payment records, customer contact details, correspondence, and evidence. You must have an appropriate legal basis and any required permissions to use personal data and to contact recipients. You must not use the Service for unlawful harassment, deceptive collection practices, spam, fraud, or any purpose prohibited by applicable law.
+Invoice Chaser helps you organise invoices and customer records, record full or partial payments, prepare and track payment reminders, and keep notes and supporting files together. Features may change over time. The Service does not guarantee that an invoice is valid, a message will be sent or delivered, a customer will pay, or a debt will be recovered.
 
-## 4. Reminders and communications
-Unless a feature clearly indicates otherwise, the Service does not independently verify the facts in a reminder. You are responsible for reviewing messages, recipients, amounts, due dates, tone, and timing before sending or authorising them. A status such as “sent” or “delivered” is not proof that a recipient read, accepted, or agreed with a message. You must comply with applicable privacy, electronic communications, consumer protection, and debt collection rules.
+## 2. Your account and responsibilities
 
-## 5. Files and evidence
-You may upload supported documents and images, such as PDFs, JPEGs, and PNGs, subject to the file limits and rules shown in the app. You must have the right to upload the material. Do not upload malware, unlawful content, payment-card security codes, passwords, or information unrelated to your use of the Service. Keep your own backups of important records. We may apply reasonable security, storage, retention, and file-size limits.
+You are responsible for keeping your sign-in details secure and for the accuracy and lawfulness of information you enter or upload. You must have the rights and lawful basis needed to store customer information and contact recipients. You must not use the Service for fraud, spam, unlawful harassment, deceptive collection practices, or other unlawful activity.
 
-## 6. Plans, trials, and payments
-If the Service offers a free trial, subscription, or paid feature, the applicable price, trial length, renewal frequency, taxes, and cancellation method will be shown before purchase. A trial may convert to a paid subscription only as disclosed at checkout and permitted by law. You authorise the selected payment provider to process charges you approve. Unless required by law or stated at checkout, fees are non-refundable for periods already used. You can cancel according to the instructions shown in your account; cancellation stops future renewals but may not refund the current period.
+## 3. Payment reminders and communications
 
-## 7. Data and privacy
-The Service needs to process account details and the business, invoice, payment, contact, and communication records you choose to store. Access should be limited to authorised users and used to operate, secure, support, and improve the Service. Do not upload data unless you are entitled to do so. A separate Privacy Notice should explain the operator’s identity, lawful bases, retention periods, service providers, user rights, international transfers, and contact details. Until that notice is published, do not use the Service to store sensitive or highly confidential personal information.
+Review each recipient, amount, due date, message, and sending time before sending or authorising a reminder. Preparing a message, copying it, opening an email draft, or logging a follow-up does not by itself mean an email or message was actually sent or delivered. A sent or delivered status does not prove that a recipient read or accepted a message. You must follow applicable privacy, electronic communications, consumer protection, and debt collection laws.
 
-## 8. Security and availability
-We use reasonable measures intended to protect the Service, but no online system can be guaranteed completely secure or continuously available. You are responsible for protecting your password, keeping account access restricted, and notifying the Service operator promptly of suspected unauthorised access. We may suspend access to investigate abuse, security risks, non-payment, or legal requirements.
+## 4. Files and payment evidence
 
-## 9. Intellectual property and acceptable use
-The Service and its software, branding, and design are owned by the operator or its licensors. You receive a limited, non-exclusive, non-transferable right to use the Service for your internal business purposes while your account is active. You must not reverse engineer, disrupt, resell, misuse, or attempt unauthorised access to the Service, except where applicable law prohibits restricting such activity.
+You may upload supported documents and images only if you have permission to use them. Do not upload malware, passwords, payment-card security codes, unlawful content, or information unrelated to your use of the Service. Keep your own backups of important records. File-size, storage, security, and retention limits may apply. Uploading a receipt or other file does not independently verify that funds have cleared.
 
-## 10. Third-party services
-The Service may connect to hosting, storage, analytics, accounting, email, messaging, or payment providers. Those providers may have their own terms and privacy policies. We are not responsible for independent third-party systems, their availability, or their acts, except where applicable law provides otherwise.
+## 5. Trials, subscriptions, and charges
 
-## 11. Disclaimers and liability
-To the maximum extent permitted by applicable law, the Service is provided “as is” and “as available” without a promise that it will be error-free or fit for every particular purpose. The Service is not legal, tax, accounting, or debt-collection advice. To the extent permitted by law, the operator will not be liable for indirect or consequential loss, lost profits, loss of data, or failed collections arising from use of the Service. Nothing in these Terms excludes liability that cannot legally be excluded, including liability for fraud or wilful misconduct where exclusion is prohibited.
+If a free trial or paid plan is offered, the applicable price, trial duration, renewal frequency, taxes, and cancellation instructions will be shown before you purchase. Any conversion from a trial to a paid plan will be disclosed at checkout and handled as required by law. Payment providers may apply their own terms. Refunds and cancellations are governed by the terms shown at purchase and applicable law.
 
-## 12. Suspension and termination
-You may stop using the Service and cancel any subscription through the account or process provided. We may suspend or terminate access for material breach, unlawful use, security concerns, or where required by law. On termination, access may end and data may be deleted according to the published retention policy and applicable law. Export or back up records you need before closing an account.
+## 6. Your information and privacy
 
-## 13. Changes to these Terms
-We may revise these Terms. We will update the version and effective date and, where required, notify you or request acceptance again before further use. The recorded acceptance should include the account, version, timestamp, and relevant audit information.
+We process account and business information you choose to store to provide, maintain, secure, and support Invoice Chaser. You must not upload information you are not entitled to use. Read the published Privacy Notice for details about information handling, retention, service providers, and your rights. Do not store sensitive or highly confidential personal information unless the Service expressly supports it and you are authorised to do so.
 
-## 14. Governing law and contact
-The governing law, dispute-resolution venue, legal operator name, registered address, and support contact must be completed by the Service operator before public launch. Mandatory consumer or data-protection rights in your jurisdiction remain unaffected.
+## 7. Availability and security
 
-## 15. Questions
-For support, use the contact method displayed in the app. For legal notices, the operator must publish a verified legal contact address before launch.
+We use reasonable measures intended to protect the Service, but we cannot guarantee uninterrupted availability or that every system will always be secure or error-free. You are responsible for protecting your account and telling us promptly if you suspect unauthorised access. We may restrict or suspend access when reasonably necessary to address security risks, misuse, non-payment, or legal requirements.
+
+## 8. Ownership and permitted use
+
+Invoice Chaser and its software, design, and branding belong to the Service operator or its licensors. While your account is active, you receive a limited, non-exclusive, non-transferable right to use the Service for your own business purposes. You must not misuse the Service, interfere with its operation, attempt unauthorised access, or resell it without written permission.
+
+## 9. Third-party services
+
+Invoice Chaser may rely on third-party hosting, storage, analytics, messaging, accounting, or payment services. Those providers may have their own terms and privacy policies. We do not control independent third-party services, except to the extent responsibility cannot be excluded under applicable law.
+
+## 10. Disclaimers and liability
+
+Invoice Chaser is an administrative tool, not legal, tax, accounting, or debt-collection advice. We do not promise that the Service will meet every requirement or that use of it will result in payment. To the extent permitted by law, we are not liable for indirect or consequential loss arising from use of the Service. Nothing in these Terms limits any liability or right that cannot lawfully be limited or excluded.
+
+## 11. Suspension and ending your use
+
+You may stop using the Service and cancel a subscription using the process provided in your account or at checkout. We may suspend or end access for serious or repeated breach of these Terms, unlawful activity, security concerns, or legal requirements. Export any records you need before closing your account. We handle retention and deletion in line with applicable policies and legal obligations.
+
+## 12. Changes to these Terms
+
+We may update these Terms as the Service changes or the law requires. We will update the version and effective date and, where required, notify you or ask you to accept the updated Terms before continuing to use affected features.
+
+## 13. Law and contacting us
+
+The governing law, legal business name, and registered address must be stated in the final published legal information for Invoice Chaser. Mandatory rights under the laws that apply to you remain unaffected. For support, use the “Contact admin on WhatsApp” link in the app or on the Invoice Chaser website. Legal notices may require a separate published contact address.
+
+## 14. Before commercial launch
+
+The Service operator must verify and publish its legal identity and contact address, publish a complete Privacy Notice, and obtain appropriate legal review before treating these Terms as final commercial terms.
