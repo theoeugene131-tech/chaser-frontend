@@ -1550,7 +1550,7 @@ export default function ChaserApp() {
             display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "9px 10px",
             color: "#8B9AAE", fontSize: 13, textDecoration: "none",
           }}>
-            <MessageCircle size={15} /> Contact support
+            <MessageCircle size={15} /> Contact admin on WhatsApp
           </a>
           <button onClick={logout} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "9px 10px", background: "transparent", border: "none", color: "#8B9AAE", fontSize: 13, cursor: "pointer" }}>
             <LogOut size={15} /> {mode === "live" ? "Log out" : "Exit demo"}
