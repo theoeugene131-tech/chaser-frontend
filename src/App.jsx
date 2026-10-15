@@ -1582,6 +1582,9 @@ export default function ChaserApp() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <div>
             <h1 style={{ margin: 0, fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 600 }}>{titles[tab]}</h1>
+            <div style={{ marginTop: 5, color: "#B8C5D6", fontSize: 13 }}>
+              Signed in as <strong style={{ color: "#3FB78A", fontWeight: 700 }}>{session.user?.name?.trim() || session.user?.email || "Your account"}</strong>
+            </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <label style={{ display: "flex", alignItems: "center", gap: 7, color: "#8B9AAE", fontSize: 11 }}>
