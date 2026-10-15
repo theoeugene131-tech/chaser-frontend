@@ -75,6 +75,19 @@ const PROVIDER_FIELDS = {
   coupa: [{ key: "clientId", label: "Client ID" }, { key: "clientSecret", label: "Client secret" }],
 };
 
+const linkBtn = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  background: "transparent",
+  border: 0,
+  color: "#5CA9E8",
+  fontSize: 12,
+  fontWeight: 600,
+  cursor: "pointer",
+  padding: 0,
+};
+
 const STAMP = {
   reminder: { label: "REMINDER SENT", color: "#3FB78A", icon: Mail },
   matched: { label: "MATCHED", color: "#5CA9E8", icon: RefreshCw },
