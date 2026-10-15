@@ -27,38 +27,44 @@ You may upload supported documents and images only if you have permission to use
 
 If a free trial or paid plan is offered, the applicable price, trial duration, renewal frequency, taxes, and cancellation instructions will be shown before you purchase. Any conversion from a trial to a paid plan will be disclosed at checkout and handled as required by law. Payment providers may apply their own terms. Refunds and cancellations are governed by the terms shown at purchase and applicable law.
 
-## 6. Your information and privacy
+## 6. Optional managed service
+
+We may offer a separate, higher-fee managed service under which our authorised team helps administer agreed invoice records, payment updates, and customer follow-ups on your behalf. This service is available only after we confirm availability, scope, pricing, access permissions, communication methods, approval requirements, and reporting arrangements with you in a separate written agreement or order.
+
+You remain responsible for the accuracy and legitimacy of your invoices, your authority to collect the amounts claimed, and decisions about disputes, discounts, write-offs, settlements, and legal action. Unless expressly agreed in writing and legally permitted, we do not act as your lawyer, debt-collection agency, or payment processor, and we do not guarantee recovery. We will not have authority to receive or redirect your customers’ funds merely because you use this service. You must provide only the access and customer data needed for the agreed work and ensure you have the legal basis to share them. Additional data-processing terms may apply.
+
+## 7. Your information and privacy
 
 We process account and business information you choose to store to provide, maintain, secure, and support Invoice Chaser. You must not upload information you are not entitled to use. Read the published Privacy Notice for details about information handling, retention, service providers, and your rights. Do not store sensitive or highly confidential personal information unless the Service expressly supports it and you are authorised to do so.
 
-## 7. Availability and security
+## 8. Availability and security
 
 We use reasonable measures intended to protect the Service, but we cannot guarantee uninterrupted availability or that every system will always be secure or error-free. You are responsible for protecting your account and telling us promptly if you suspect unauthorised access. We may restrict or suspend access when reasonably necessary to address security risks, misuse, non-payment, or legal requirements.
 
-## 8. Ownership and permitted use
+## 9. Ownership and permitted use
 
 Invoice Chaser and its software, design, and branding belong to the Service operator or its licensors. While your account is active, you receive a limited, non-exclusive, non-transferable right to use the Service for your own business purposes. You must not misuse the Service, interfere with its operation, attempt unauthorised access, or resell it without written permission.
 
-## 9. Third-party services
+## 10. Third-party services
 
 Invoice Chaser may rely on third-party hosting, storage, analytics, messaging, accounting, or payment services. Those providers may have their own terms and privacy policies. We do not control independent third-party services, except to the extent responsibility cannot be excluded under applicable law.
 
-## 10. Disclaimers and liability
+## 11. Disclaimers and liability
 
 Invoice Chaser is an administrative tool, not legal, tax, accounting, or debt-collection advice. We do not promise that the Service will meet every requirement or that use of it will result in payment. To the extent permitted by law, we are not liable for indirect or consequential loss arising from use of the Service. Nothing in these Terms limits any liability or right that cannot lawfully be limited or excluded.
 
-## 11. Suspension and ending your use
+## 12. Suspension and ending your use
 
 You may stop using the Service and cancel a subscription using the process provided in your account or at checkout. We may suspend or end access for serious or repeated breach of these Terms, unlawful activity, security concerns, or legal requirements. Export any records you need before closing your account. We handle retention and deletion in line with applicable policies and legal obligations.
 
-## 12. Changes to these Terms
+## 13. Changes to these Terms
 
 We may update these Terms as the Service changes or the law requires. We will update the version and effective date and, where required, notify you or ask you to accept the updated Terms before continuing to use affected features.
 
-## 13. Law and contacting us
+## 14. Law and contacting us
 
 The governing law, legal business name, and registered address must be stated in the final published legal information for Invoice Chaser. Mandatory rights under the laws that apply to you remain unaffected. For support, use the “Contact admin on WhatsApp” link in the app or on the Invoice Chaser website. Legal notices may require a separate published contact address.
 
-## 14. Before commercial launch
+## 15. Before commercial launch
 
 The Service operator must verify and publish its legal identity and contact address, publish a complete Privacy Notice, and obtain appropriate legal review before treating these Terms as final commercial terms.
