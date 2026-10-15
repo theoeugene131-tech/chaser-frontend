@@ -94,13 +94,13 @@ export default function LandingPage() {
               Bring your outstanding invoices, customer follow-ups, and payment records into one clear workspace — so nothing slips through the cracks.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-              <button className="ic-cta" onClick={() => action("start_trial_hero", "/app")} style={{ ...button, background: "#3fb78a", color: "#081522", border: "1px solid #3fb78a" }}>Start your 14-day trial <span>→</span></button>
+              <button className="ic-cta" onClick={() => action("start_trial_hero", "/app")} style={{ ...button, background: "#3fb78a", color: "#081522", border: "1px solid #3fb78a" }}>Create your account <span>→</span></button>
               <a className="ic-cta" href="#features" onClick={() => track("click_explore_features", "explore_features")} style={{ ...button, background: "#132238", color: "#e4edf5", border: "1px solid #2b4058" }}>Explore features</a>
             </div>
             <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 18, marginTop: 27, color: "#8296ab", fontSize: 12 }}>
               <span>✓ Invoice visibility</span><span>✓ Payment tracking</span><span>✓ Manual follow-ups</span>
             </div>
-            <p style={{ color: "#6f8298", fontSize: 11, marginTop: 18 }}>Trial availability and subscription terms will be shown during sign-up.</p>
+            <p style={{ color: "#6f8298", fontSize: 11, marginTop: 18 }}>Trial and billing controls are still being set up; subscription terms should be confirmed before commercial launch.</p>
           </div>
 
           <div className="ic-preview" style={{ position: "relative" }}>
