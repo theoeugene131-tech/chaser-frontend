@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 
 const API = "https://chaser-backend-6jsv.onrender.com";
+const WHATSAPP_CONTACT = "https://wa.me/2348026892077";
 function sessionId() {
   try {
     let id = localStorage.getItem("ic_analytics_session");
@@ -43,6 +44,15 @@ export default function LandingPage() {
     track(`click_${target}`, target);
     window.location.href = href;
   };
+  const sharePage = async () => {
+    track("click_share_landing", "share_landing");
+    const shareData = { title: "Invoice Chaser", text: "Manage outstanding invoices, payment records, and customer follow-ups with Invoice Chaser.", url: window.location.origin };
+    try {
+      if (navigator.share) await navigator.share(shareData);
+      else if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(shareData.url); window.alert("Landing page link copied. You can now share it."); }
+      else window.prompt("Copy this link to share Invoice Chaser:", shareData.url);
+    } catch (error) { if (error?.name !== "AbortError") window.prompt("Copy this link to share Invoice Chaser:", shareData.url); }
+  };
   const button = {
     display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 9,
     padding: "13px 19px", borderRadius: 9, fontWeight: 750, fontSize: 14,
@@ -76,6 +86,8 @@ export default function LandingPage() {
             <a className="ic-link" href="#features" onClick={() => track("click_features_nav", "features_nav")} style={{ color: "#b4c2d2", textDecoration: "none" }}>Features</a>
             <a className="ic-link" href="#how-it-works" onClick={() => track("click_how_nav", "how_nav")} style={{ color: "#b4c2d2", textDecoration: "none" }}>How it works</a>
             <a className="ic-link ic-login" href="/app" onClick={(e) => { e.preventDefault(); action("login_nav", "/app"); }} style={{ color: "#b4c2d2", textDecoration: "none" }}>Log in</a>
+            <button className="ic-cta" onClick={sharePage} style={{ ...button, background: "transparent", color: "#b4c2d2", border: "1px solid #2b4058", padding: "10px 12px" }}>↗ Share</button>
+            <a href={WHATSAPP_CONTACT} target="_blank" rel="noopener noreferrer" onClick={() => track("click_contact_admin_nav", "contact_admin_nav")} className="ic-link" style={{ color: "#b4c2d2", textDecoration: "none", whiteSpace: "nowrap" }}>Contact admin</a>
             <button className="ic-cta" onClick={() => action("start_trial_nav", "/app")} style={{ ...button, background: "#3fb78a", color: "#081522", border: 0, padding: "10px 14px" }}>Get started <span>↗</span></button>
           </nav>
         </div>
@@ -155,7 +167,7 @@ export default function LandingPage() {
       <footer style={{ borderTop: "1px solid #1d2e43", background: "#081321" }}>
         <div className="ic-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, flexWrap: "wrap", padding: "24px 0", color: "#8194a9", fontSize: 11 }}>
           <span>© {new Date().getFullYear()} Invoice Chaser. All rights reserved.</span>
-          <div style={{ display: "flex", gap: 18 }}><a href="/app" onClick={(e) => { e.preventDefault(); action("footer_login", "/app"); }} style={{ color: "#9bacc0", textDecoration: "none" }}>Log in</a><a href="/owner" onClick={() => track("click_owner_portal", "owner_portal")} style={{ color: "#62758b", textDecoration: "none" }}>Owner portal</a></div>
+          <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}><a href="/app" onClick={(e) => { e.preventDefault(); action("footer_login", "/app"); }} style={{ color: "#9bacc0", textDecoration: "none" }}>Log in</a><a href={WHATSAPP_CONTACT} target="_blank" rel="noopener noreferrer" onClick={() => track("click_contact_admin_footer", "contact_admin_footer")} style={{ color: "#9bacc0", textDecoration: "none" }}>Contact admin on WhatsApp</a><a href="/owner" onClick={() => track("click_owner_portal", "owner_portal")} style={{ color: "#62758b", textDecoration: "none" }}>Owner portal</a></div>
         </div>
       </footer>
     </div>
