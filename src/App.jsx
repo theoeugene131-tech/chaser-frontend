@@ -877,7 +877,7 @@ function ManualReminderModal({ apiUrl, token, invoice, onClose, onDone }) {
   };
 
   const emailHref = invoice.customerEmail
-    ? "mailto:" + encodeURIComponent(invoice.customerEmail) + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(message.split("\n\n").slice(2).join("\n\n"))
+    ? "mailto:" + encodeURIComponent(invoice.customerEmail) + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(message.split("\n\n").slice(1).join("\n\n"))
     : null;
 
   return (
