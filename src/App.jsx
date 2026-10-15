@@ -840,6 +840,64 @@ function AddInvoiceModal({ apiUrl, token, onClose, onCreated }) {
   );
 }
 
+function ManualReminderModal({ apiUrl, token, invoice, onClose, onDone }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+  const due = invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : "the agreed due date";
+  const balanceCents = Math.max(0, (invoice.amountCents || 0) - (invoice.amountPaidCents || 0));
+  const subject = "Payment reminder — invoice " + invoice.number;
+  const message = "Subject: " + subject + "\n\nHello " + (invoice.customerName || "there") + ",\n\nI hope you're doing well. This is a friendly reminder that invoice " + invoice.number + " for " + moneyFull(balanceCents) + " is outstanding and was due on " + due + ".\n\nPlease let me know when we can expect payment, or contact me if you've already paid and I should update our records.\n\nThank you,\nYour accounts team";
+
+  const copyMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(message);
+      setCopied(true);
+      setError("");
+    } catch {
+      setError("Copy was blocked by your browser. Select and copy the message manually.");
+    }
+  };
+
+  const markFollowUp = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      await apiRequest(apiUrl, token, "/api/invoices/" + invoice.id + "/note", {
+        method: "POST",
+        body: JSON.stringify({ note: "Manual payment reminder sent outside Invoice Chaser (email/WhatsApp). Please verify the message was actually sent." }),
+      });
+      onDone();
+      onClose();
+    } catch (err) {
+      setError(err.message || "Could not log the follow-up.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const emailHref = invoice.customerEmail
+    ? "mailto:" + encodeURIComponent(invoice.customerEmail) + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(message.split("\n\n").slice(2).join("\n\n"))
+    : null;
+
+  return (
+    <Modal title={"Prepare reminder · " + invoice.number} onClose={onClose}>
+      <p style={{ fontSize: 12, color: "#8B9AAE", lineHeight: 1.5, marginTop: 0 }}>
+        No email service or domain needed. Copy this message into Gmail or WhatsApp, or open your email app if the customer has an email address saved.
+      </p>
+      <div style={{ background: "#0B1524", border: "1px solid #24354F", borderRadius: 7, padding: 12, maxHeight: 260, overflowY: "auto", whiteSpace: "pre-wrap", fontSize: 12, lineHeight: 1.6, color: "#EDEAE0" }}>{message}</div>
+      {error && <div style={{ fontSize: 12, color: "#E85D4D", marginTop: 10 }}>{error}</div>}
+      {copied && <div style={{ fontSize: 12, color: "#3FB78A", marginTop: 10 }}>Message copied. Paste it into Gmail or WhatsApp.</div>}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
+        <button onClick={copyMessage} style={{ background: "#3FB78A", border: 0, color: "#0B1524", fontWeight: 700, padding: "10px", borderRadius: 7, cursor: "pointer" }}>{copied ? "Copy again" : "Copy reminder message"}</button>
+        {emailHref && <a href={emailHref} style={{ textAlign: "center", textDecoration: "none", background: "#233450", border: "1px solid #2E4463", color: "#EDEAE0", fontSize: 12.5, fontWeight: 600, padding: "10px", borderRadius: 7 }}>Open email draft for {invoice.customerEmail}</a>}
+        <button onClick={markFollowUp} disabled={busy} style={{ background: "transparent", border: "1px solid #24354F", color: "#8B9AAE", padding: "9px", borderRadius: 7, cursor: "pointer" }}>{busy ? "Logging..." : "I sent it — log follow-up"}</button>
+      </div>
+      <p style={{ fontSize: 10.5, color: "#5A6B84", lineHeight: 1.5, marginBottom: 0 }}>Invoice Chaser will not send this message itself. Only click “I sent it” after you send it manually.</p>
+    </Modal>
+  );
+}
+
 const td = { padding: "12px 8px", borderBottom: "1px solid #24354F", fontSize: 12.5, verticalAlign: "middle" };
 
 function InvoicesView({ apiUrl, token, mode }) {
@@ -848,7 +906,7 @@ function InvoicesView({ apiUrl, token, mode }) {
   const [loading, setLoading] = useState(mode !== "demo");
   const [actioning, setActioning] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
-  const [activeModal, setActiveModal] = useState(null); // { type: 'payment'|'note'|'edit'|'dispute'|'delete', invoice }
+  const [activeModal, setActiveModal] = useState(null); // { type: reminder/payment/note/edit/dispute/delete, invoice }
   const [confirmBusy, setConfirmBusy] = useState(false);
   const [confirmError, setConfirmError] = useState("");
 
@@ -949,7 +1007,7 @@ function InvoicesView({ apiUrl, token, mode }) {
                 <td style={{ ...td, display: "flex", gap: 6, alignItems: "center" }}>
                   {inv.status !== "paid" && (
                     <>
-                      <ActionBtn label="Nudge" icon={Zap} busy={actioning === inv.id + "remind"} onClick={() => act(inv.id, "remind")} />
+                      <ActionBtn label="Draft reminder" icon={Mail} onClick={() => setActiveModal({ type: "reminder", invoice: inv })} />
                       <ActionBtn label="Escalate" icon={AlertTriangle} busy={actioning === inv.id + "escalate"} onClick={() => act(inv.id, "escalate")} />
                     </>
                   )}
@@ -971,6 +1029,9 @@ function InvoicesView({ apiUrl, token, mode }) {
 
       {showAdd && <AddInvoiceModal apiUrl={apiUrl} token={token} onClose={() => setShowAdd(false)} onCreated={load} />}
 
+      {activeModal?.type === "reminder" && (
+        <ManualReminderModal apiUrl={apiUrl} token={token} invoice={activeModal.invoice} onClose={closeModal} onDone={load} />
+      )}
       {activeModal?.type === "payment" && (
         <RecordPaymentModal apiUrl={apiUrl} token={token} invoice={activeModal.invoice} onClose={closeModal} onDone={load} />
       )}
