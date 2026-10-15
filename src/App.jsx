@@ -1351,7 +1351,7 @@ function IntegrationsView({ apiUrl, token, mode }) {
                 <div style={{ fontSize: 11.5, color: "#8B9AAE", marginTop: 2 }}>{PROVIDER_ROLE[it.provider]}</div>
               </div>
               <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", padding: "3px 8px", borderRadius: 20, color: it.connected ? "#3FB78A" : "#5A6B84", background: it.connected ? "#3FB78A1A" : "#5A6B841A" }}>
-                {it.connected ? "CONNECTED" : "NOT CONNECTED"}
+                {it.connected ? "CONNECTED" : "PLANNED"}
               </span>
             </div>
 
