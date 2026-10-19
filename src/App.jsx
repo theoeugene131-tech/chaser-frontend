@@ -65,6 +65,7 @@ const DEMO_INTEGRATIONS = [
   { provider: "coupa", status: "coming_soon", connected: false, lastSyncedAt: null },
 ];
 
+const PROVIDER_STATUS = { stripe: "live", quickbooks: "coming_soon", netsuite: "coming_soon", billcom: "coming_soon", coupa: "coming_soon" };
 const PROVIDER_LABEL = { stripe: "Stripe", quickbooks: "QuickBooks", netsuite: "NetSuite", billcom: "Bill.com", coupa: "Coupa" };
 const PROVIDER_ROLE = { stripe: "Payments", quickbooks: "Accounting", netsuite: "ERP", billcom: "AP/AR", coupa: "Supplier portal" };
 const PROVIDER_FIELDS = {
@@ -1366,12 +1367,12 @@ function IntegrationsView({ apiUrl, token, mode }) {
                 <div style={{ fontSize: 15, fontWeight: 700, color: "#EDEAE0" }}>{PROVIDER_LABEL[it.provider]}</div>
                 <div style={{ fontSize: 11.5, color: "#8B9AAE", marginTop: 2 }}>{PROVIDER_ROLE[it.provider]}</div>
               </div>
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", padding: "3px 8px", borderRadius: 20, color: it.status === "coming_soon" ? "#E8A33D" : it.connected ? "#3FB78A" : "#5A6B84", background: it.status === "coming_soon" ? "#E8A33D1A" : it.connected ? "#3FB78A1A" : "#5A6B841A" }}>
-                {it.status === "coming_soon" ? "COMING SOON" : it.connected ? "CONNECTED" : "PLANNED"}
+              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", padding: "3px 8px", borderRadius: 20, color: PROVIDER_STATUS[it.provider] === "coming_soon" ? "#E8A33D" : it.connected ? "#3FB78A" : "#5A6B84", background: PROVIDER_STATUS[it.provider] === "coming_soon" ? "#E8A33D1A" : it.connected ? "#3FB78A1A" : "#5A6B841A" }}>
+                {PROVIDER_STATUS[it.provider] === "coming_soon" ? "COMING SOON" : it.connected ? "CONNECTED" : "NOT CONNECTED"}
               </span>
             </div>
 
-            {it.status === "coming_soon" ? (
+            {PROVIDER_STATUS[it.provider] === "coming_soon" ? (
               <div style={{ marginTop: 14, fontSize: 12, lineHeight: 1.5, color: "#8B9AAE" }}>
                 This connection is not available yet. You can still add invoices and payments manually.
               </div>
