@@ -6,14 +6,14 @@ import {
 import {
   Inbox, LayoutGrid, FileText, Users, Plug, Settings, Mail, RefreshCw,
   AlertTriangle, CheckCircle2, Search, Bell, ChevronRight, TrendingUp,
-  Clock, DollarSign, Percent, ArrowUpRight, X, Loader2, WifiOff, LogOut,
+  Clock, Banknote, DollarSign, Percent, ArrowUpRight, X, Loader2, WifiOff, LogOut,
   Zap, ShieldAlert, MessageCircle, MoreVertical,
 } from "lucide-react";
 
 const WHATSAPP_CONTACT = "https://wa.me/2348026892077";
 
 // The one place the backend URL lives now — no field for the user to see or type.
-const API_BASE_URL = "https://chaser-backend-6jsv.onrender.com";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://chaser-backend-6jsv.onrender.com";
 
 // =====================================================================
 // Demo fallback data — used only when no live API is reachable, so the
@@ -58,11 +58,11 @@ const DEMO_CUSTOMERS = [
 ];
 
 const DEMO_INTEGRATIONS = [
-  { provider: "stripe", connected: true, lastSyncedAt: new Date().toISOString() },
-  { provider: "quickbooks", connected: true, lastSyncedAt: new Date().toISOString() },
-  { provider: "netsuite", connected: true, lastSyncedAt: new Date().toISOString() },
-  { provider: "billcom", connected: false, lastSyncedAt: null },
-  { provider: "coupa", connected: false, lastSyncedAt: null },
+  { provider: "stripe", status: "coming_soon", connected: false, lastSyncedAt: null },
+  { provider: "quickbooks", status: "coming_soon", connected: false, lastSyncedAt: null },
+  { provider: "netsuite", status: "coming_soon", connected: false, lastSyncedAt: null },
+  { provider: "billcom", status: "coming_soon", connected: false, lastSyncedAt: null },
+  { provider: "coupa", status: "coming_soon", connected: false, lastSyncedAt: null },
 ];
 
 const PROVIDER_LABEL = { stripe: "Stripe", quickbooks: "QuickBooks", netsuite: "NetSuite", billcom: "Bill.com", coupa: "Coupa" };
@@ -94,6 +94,7 @@ const STAMP = {
   escalated: { label: "ESCALATED", color: "#E8A33D", icon: AlertTriangle },
   paid: { label: "PAID", color: "#3FB78A", icon: CheckCircle2 },
   current: { label: "ON TRACK", color: "#8B9AAE", icon: Clock },
+  overdue: { label: "OVERDUE", color: "#E8A33D", icon: AlertTriangle },
   disputed: { label: "DISPUTED", color: "#E85D4D", icon: ShieldAlert },
   note: { label: "NOTE", color: "#8B9AAE", icon: MessageCircle },
 };
@@ -1058,7 +1059,7 @@ function InvoicesView({ apiUrl, token, mode }) {
                 <td style={{ ...td, color: "#8B9AAE" }}>{new Date(inv.dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                   {inv.daysPastDue > 0 && <span style={{ color: "#E8A33D", marginLeft: 6, fontSize: 11 }}>· {inv.daysPastDue}d late</span>}
                 </td>
-                <td style={td}><StampBadge type={inv.status} /></td>
+                <td style={td}><StampBadge type={inv.status === "current" && inv.daysPastDue > 0 ? "overdue" : inv.status} /></td>
                 <td style={{ ...td, display: "flex", gap: 6, alignItems: "center" }}>
                   {inv.status !== "paid" && inv.status !== "disputed" && (
                     <>
@@ -1068,7 +1069,7 @@ function InvoicesView({ apiUrl, token, mode }) {
                   )}
                   {mode !== "demo" && (
                     <RowMenu items={[
-                      { label: "Record payment", icon: DollarSign, disabled: inv.status === "paid", onClick: () => setActiveModal({ type: "payment", invoice: inv }) },
+                      { label: "Record payment", icon: Banknote, disabled: inv.status === "paid", onClick: () => setActiveModal({ type: "payment", invoice: inv }) },
                       { label: "Add note", icon: MessageCircle, onClick: () => setActiveModal({ type: "note", invoice: inv }) },
                       { label: "Mark disputed", icon: ShieldAlert, disabled: inv.status === "disputed" || inv.status === "paid", onClick: () => setActiveModal({ type: "dispute", invoice: inv }) },
                       { label: "Edit", icon: Settings, onClick: () => setActiveModal({ type: "edit", invoice: inv }) },
@@ -1365,12 +1366,16 @@ function IntegrationsView({ apiUrl, token, mode }) {
                 <div style={{ fontSize: 15, fontWeight: 700, color: "#EDEAE0" }}>{PROVIDER_LABEL[it.provider]}</div>
                 <div style={{ fontSize: 11.5, color: "#8B9AAE", marginTop: 2 }}>{PROVIDER_ROLE[it.provider]}</div>
               </div>
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", padding: "3px 8px", borderRadius: 20, color: it.connected ? "#3FB78A" : "#5A6B84", background: it.connected ? "#3FB78A1A" : "#5A6B841A" }}>
-                {it.connected ? "CONNECTED" : "PLANNED"}
+              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", padding: "3px 8px", borderRadius: 20, color: it.status === "coming_soon" ? "#E8A33D" : it.connected ? "#3FB78A" : "#5A6B84", background: it.status === "coming_soon" ? "#E8A33D1A" : it.connected ? "#3FB78A1A" : "#5A6B841A" }}>
+                {it.status === "coming_soon" ? "COMING SOON" : it.connected ? "CONNECTED" : "PLANNED"}
               </span>
             </div>
 
-            {it.connected ? (
+            {it.status === "coming_soon" ? (
+              <div style={{ marginTop: 14, fontSize: 12, lineHeight: 1.5, color: "#8B9AAE" }}>
+                This connection is not available yet. You can still add invoices and payments manually.
+              </div>
+            ) : it.connected ? (
               <button onClick={() => sync(it.provider)} disabled={busy || mode === "demo"} style={{ marginTop: 14, background: "#233450", border: "1px solid #2E4463", color: "#EDEAE0", fontSize: 12, padding: "6px 12px", borderRadius: 6, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
                 <RefreshCw size={12} /> Sync now
               </button>
